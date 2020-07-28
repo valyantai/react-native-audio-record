@@ -29,8 +29,10 @@ RCT_EXPORT_METHOD(start) {
     RCTLogInfo(@"start");
 
     // most audio players set session category to "Playback", record won't work in this mode
-    // therefore set session category to "Record" before recording
-    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord withOptions:(AVAudioSessionCategoryOptionDefaultToSpeaker | AVAudioSessionCategoryOptionAllowBluetooth) setMode:AVAudioSessionModeMeasurement error:nil];
+    // therefore set session category to "Record" or "PlayAndRecord" before recording
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord withOptions:(AVAudioSessionCategoryOptionDefaultToSpeaker | AVAudioSessionCategoryOptionAllowBluetooth) error:nil];
+    // setMode to "Measurement" to ensure no auto-gain control or other processing
+    [[AVAudioSession sharedInstance] setMode:AVAudioSessionModeVoicePrompt error:nil];
 
     _recordState.mIsRunning = true;
     _recordState.mCurrentPacket = 0;
