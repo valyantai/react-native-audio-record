@@ -30,9 +30,17 @@ RCT_EXPORT_METHOD(start) {
 
     // most audio players set session category to "Playback", record won't work in this mode
     // therefore set session category to "Record" or "PlayAndRecord" before recording
-    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord withOptions:(AVAudioSessionCategoryOptionDefaultToSpeaker | AVAudioSessionCategoryOptionAllowBluetooth) error:nil];
-    // setMode to "Measurement" to ensure no auto-gain control or other processing
-    [[AVAudioSession sharedInstance] setMode:AVAudioSessionModeVoicePrompt error:nil];
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord
+        withOptions:(AVAudioSessionCategoryOptionDefaultToSpeaker |
+        AVAudioSessionCategoryOptionAllowBluetooth |
+        AVAudioSessionCategoryOptionMixWithOthers) error:nil];
+    // setMode to "VoicePrompt" to ensure we get proper iOS processing for guided navigation by voice
+    if (@available(iOS 12.0, *)) {
+        [[AVAudioSession sharedInstance] setMode:AVAudioSessionModeVoicePrompt error:nil];
+    } else {
+        // Fallback on earlier versions
+        [[AVAudioSession sharedInstance] setMode:AVAudioSessionModeDefault error:nil];
+    }
 
     _recordState.mIsRunning = true;
     _recordState.mCurrentPacket = 0;
